@@ -32,6 +32,9 @@ extern GetParseErrorFunc GetParseError;
 // Convert a std::string into Value without copying
 inline Value ToValue(const std::string &str) { return Value(str.c_str(), str.size()); }
 
+// Check if @param path is a json path or multi json path
+bool IsMultiPaths(const Value &path);
+
 // Check if @param path is an array and only contains string and integer elements, throws
 // runtime_error otherwise.
 void CheckPath(const Value &path);

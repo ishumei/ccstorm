@@ -98,7 +98,7 @@ void ParseRoot(const string &path, int current_index, Value &output) {
 
 namespace storm { namespace json {
 
-void CheckPath(const Value &path) {
+void CheckSinglePath(const Value &path) {
     if (!path.IsArray()) throw runtime_error("json path is not an array");
     for (unsigned int i = 0; i < path.Size(); ++i) {
         if (!(path[i].IsString() || path[i].IsInt())) {
@@ -108,7 +108,33 @@ void CheckPath(const Value &path) {
         }
     }
 }
+// check path is multi paths
+void CheckMultiPaths(const Value &path) {
+    if (!path.IsArray()) throw runtime_error("json path is not an array");
+    for (unsigned int i=0; i < path.Size(); ++i) {
+        const Value &subPath = path[i];
+        if (!subPath.IsArray()) throw runtime_error("sub json path is not an array");
+        CheckSinglePath(subPath);
+    }   
+}
 
+void CheckPath(const Value &path) {
+	if (IsMultiPaths(path)) {
+		CheckMultiPaths(path);
+	} else {
+		CheckSinglePath(path);
+	}
+}
+
+bool IsMultiPaths(const Value &path) {
+    if (!path.IsArray()) throw runtime_error("json path is not an array");
+    for (unsigned int i=0; i < path.Size(); ++i) {
+        if (path[i].IsArray()) {
+            return true;
+        }
+    }
+    return false;
+}
 Value StringToPath(const string &path_str) {
     Value path;
     path.SetArray();
@@ -116,9 +142,9 @@ Value StringToPath(const string &path_str) {
     return move(path);
 }
 
-string PathToString(const Value &path) {
-    if (!path.IsArray()) throw runtime_error("json path is not an array");
 
+string SinglePathToString(const Value &path) {
+    //if (!path.IsArray()) throw runtime_error("json path is not an array");
     stringstream ss;
     ss << "$";
     for (unsigned int i = 0; i < path.Size(); ++i) {
@@ -133,6 +159,26 @@ string PathToString(const Value &path) {
         }
     }
     return ss.str();
+}
+
+string  MultiPathsToString(const Value &paths) {
+    //if (!IsMultiPaths(paths)) throw runtime_error("json path is not multi paths");
+    stringstream ss;
+    for (unsigned int i=0; i<paths.Size(); ++i) {
+        if (i != 0) {
+            ss << "_";
+        }
+        ss << SinglePathToString(paths[i]);
+    }
+    return ss.str();
+}
+
+string PathToString(const Value &paths) {
+    if (IsMultiPaths(paths)) {
+        return MultiPathsToString(paths);
+    } else {
+        return SinglePathToString(paths);
+    }
 }
 
 const Value *GetValue(const Value &root, const Value &path) {

@@ -14,6 +14,7 @@ set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VE
 # Compile in release with debug info mode by default
 SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build Type")
 option(STORM_BUILD_TESTS "Build storm unittests." ON)
+option(STORM_ENABLE_COVERAGE "Build storm with code coverage support." ON)
 option(STORM_PROTOCOL_DEBUG_ENABLE "Log every input/output message." OFF)
 set(STORM_PROTOCOL_DEBUG "/tmp")
 
@@ -21,10 +22,9 @@ if (STORM_PROTOCOL_DEBUG_ENABLE)
     add_definitions(-DSTORM_PROTOCOL_DEBUG="${STORM_PROTOCOL_DEBUG}")
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -Wall -Wextra")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native -Wall -Wextra")
+if(ENABLE_COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

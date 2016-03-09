@@ -12,7 +12,7 @@ _build=$_root/build
 rm -rf $_build
 mkdir $_build
 cd $_build
-cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON -DCMAKE_CXX_COMPILER=g++ ..     
+cmake -DCMAKE_BUILD_TYPE=Debug -DSTORM_ENABLE_COVERAGE=ON -DCMAKE_CXX_COMPILER=g++ ..     
 make -j5
 cd $_root
 

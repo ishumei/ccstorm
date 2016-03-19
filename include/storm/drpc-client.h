@@ -6,7 +6,8 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "DistributedRPC.h"
+
+class DistributedRPCClient;
 
 namespace storm {
 

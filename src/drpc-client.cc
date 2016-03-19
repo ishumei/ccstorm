@@ -53,7 +53,11 @@ namespace storm {
 
 DRPCClient::DRPCClient(const string &hosts, int port, int timeout)
         : _port(port), _timeout(timeout) {
-    _hosts = split(hosts, ',');
+    DRPCClient(split(hosts, ','), port, timeout);
+}
+
+DRPCClient::DRPCClient(const vector<string> &hosts, int port, int timeout) {
+    _hosts = hosts;
     if (_hosts.empty()) {
         throw runtime_error("no drpc hosts specified");
     }

@@ -13,6 +13,7 @@ namespace storm {
 class DRPCClient {
 public:
     DRPCClient(const std::string &hosts, int port, int timeout);
+    DRPCClient(const std::vector<std::string> &hosts, int port, int timeout);
 
     std::string execute(const std::string &function, const std::string &args);
 

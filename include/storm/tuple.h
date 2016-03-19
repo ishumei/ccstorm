@@ -35,7 +35,7 @@ public:
     const Values &values() const { return _values; }
     Values &mutable_values() { return _values; }
     
-    const std::string &debug_string() const {
+    const std::string debug_string() const {
         std::stringstream ss;
         ss << "id = " << id()
            << ", component = " << component()

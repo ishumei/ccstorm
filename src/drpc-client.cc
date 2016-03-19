@@ -51,19 +51,28 @@ vector<string> split(const string &s, char delim) {
 
 namespace storm {
 
-DRPCClient::DRPCClient(const string &hosts, int port, int timeout)
-        : _port(port), _timeout(timeout) {
+DRPCClient::DRPCClient(const string &hosts, int port, int timeout) {
     DRPCClient(split(hosts, ','), port, timeout);
 }
 
 DRPCClient::DRPCClient(const vector<string> &hosts, int port, int timeout) {
     _hosts = hosts;
+    _port = port;
+    _timeout = timeout;
+    _client = nullptr;
+
     if (_hosts.empty()) {
         throw runtime_error("no drpc hosts specified");
     }
     srand(time(nullptr));
     _current_host = rand() % _hosts.size();
+
     connect();
+}
+
+DRPCClient::~DRPCClient() {
+    delete _client;
+    _client = nullptr;
 }
 
 string DRPCClient::execute(const string &function, const string &args) {
@@ -75,7 +84,8 @@ string DRPCClient::execute(const string &function, const string &args) {
         _client->execute(response, function, args);
         return std::move(response);
     } catch (exception &e) {
-        _client.reset(nullptr);
+        delete _client;
+        _client = nullptr;
         throw;
     }
 }
@@ -89,7 +99,7 @@ void DRPCClient::connect() {
     socket->open();
     shared_ptr<TFramedTransport> transport(new TFramedTransport(socket));
     shared_ptr<TBinaryProtocol> protocol(new TBinaryProtocol(transport));
-    _client.reset(new DistributedRPCClient(protocol));
+    _client = new DistributedRPCClient(protocol);
 }
 
 }  // namespace storm

@@ -4,7 +4,6 @@
 #define STORM_DRPC_CLIENT_H
 
 #include <string>
-#include <memory>
 #include <vector>
 
 class DistributedRPCClient;
@@ -15,6 +14,7 @@ class DRPCClient {
 public:
     DRPCClient(const std::string &hosts, int port, int timeout);
     DRPCClient(const std::vector<std::string> &hosts, int port, int timeout);
+    ~DRPCClient();
 
     std::string execute(const std::string &function, const std::string &args);
 
@@ -29,7 +29,7 @@ private:
     std::vector<std::string> _hosts;
     int _port;
     int _timeout;
-    std::unique_ptr<DistributedRPCClient> _client;
+    DistributedRPCClient *_client;
 };
 
 }  // namespace storm

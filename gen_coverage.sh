@@ -19,6 +19,7 @@ cd $_root
 lcov -d $_build -z
 lcov -d $_build -b . --no-external -i -c -o $_build/ccstorm_coverage_init.info
 lcov -r $_build/ccstorm_coverage_init.info \
+        '/usr/*' \
         $_root'/thirdparty/*' \
         $_root'/include/rapidjson/*' \
         $_root'/test/*' \
@@ -27,6 +28,7 @@ lcov -r $_build/ccstorm_coverage_init.info \
 $_build/ccstorm_unit_tests
 lcov -d $_build -b . --no-external -c -o $_build/ccstorm_coverage_report.info
 lcov -r $_build/ccstorm_coverage_report.info \
+        '/usr/*' \
         $_root'/thirdparty/*' \
         $_root'/include/rapidjson/*' \
         $_root'/test/*' \

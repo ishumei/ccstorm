@@ -13,7 +13,6 @@
 #include "thrift/transport/TSocket.h"
 #include "thrift/transport/TBufferTransports.h"
 #include "thrift/protocol/TBinaryProtocol.h"
-#include "DistributedRPC.h"
 
 using std::string;
 using std::move;
@@ -56,10 +55,11 @@ DRPCClient::DRPCClient(const string &hosts, int port, int timeout) {
 }
 
 DRPCClient::DRPCClient(const vector<string> &hosts, int port, int timeout) {
+    _current_host = 0;
     _hosts = hosts;
     _port = port;
     _timeout = timeout;
-    _client = nullptr;
+    _client.reset(nullptr);
 
     if (_hosts.empty()) {
         throw runtime_error("no drpc hosts specified");
@@ -68,11 +68,6 @@ DRPCClient::DRPCClient(const vector<string> &hosts, int port, int timeout) {
     _current_host = rand() % _hosts.size();
 
     connect();
-}
-
-DRPCClient::~DRPCClient() {
-    delete _client;
-    _client = nullptr;
 }
 
 string DRPCClient::execute(const string &function, const string &args) {
@@ -84,8 +79,7 @@ string DRPCClient::execute(const string &function, const string &args) {
         _client->execute(response, function, args);
         return std::move(response);
     } catch (exception &e) {
-        delete _client;
-        _client = nullptr;
+        _client.reset(nullptr);
         throw;
     }
 }
@@ -99,7 +93,7 @@ void DRPCClient::connect() {
     socket->open();
     shared_ptr<TFramedTransport> transport(new TFramedTransport(socket));
     shared_ptr<TBinaryProtocol> protocol(new TBinaryProtocol(transport));
-    _client = new DistributedRPCClient(protocol);
+    _client.reset(new DistributedRPCClient(protocol));
 }
 
 }  // namespace storm

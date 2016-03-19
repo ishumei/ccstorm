@@ -5,6 +5,7 @@
 #define STORM_TUPLE_H
 
 #include <string>
+#include <sstream>
 #include <utility>
 #include "storm/values.h"
 
@@ -33,6 +34,15 @@ public:
     int task() const { return _task; }
     const Values &values() const { return _values; }
     Values &mutable_values() { return _values; }
+    
+    const std::string &debug_string() const {
+        std::stringstream ss;
+        ss << "id = " << id()
+           << ", component = " << component()
+           << ", stream = " << stream()
+           << ", value = " << storm::json::ValueToString(values());
+        return ss.str();
+    }
 
 private:
     std::string _id;

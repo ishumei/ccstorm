@@ -19,11 +19,14 @@ public:
 
     virtual void Run(std::istream &istream, std::ostream &ostream) {
         Component::Run(istream, ostream);
-        _oc.reset(new OutputCollector(os()));
+        _oc.reset(new OutputCollector(os(), enable_debug()));
         Prepare();
 
         while(is().good()) {
             json::Value message { internal::protocol::NextMessage(is()) };
+            if (enable_debug()) {
+                Log(std::string("Received raw message") + storm::json::ValueToString(message));
+            }
             if (message.IsArray()) {
                 continue;  // ignore receiving taskids for now
             }
@@ -31,6 +34,9 @@ public:
             if (_tuple->stream() == "__heartbeat") {
                 internal::protocol::EmitSync(os());
             } else {
+                if (enable_debug()) {
+                    Log(std::string("Processing tuple: ") + _tuple->debug_string());
+                }
                 Execute(_tuple);
             }
         }
